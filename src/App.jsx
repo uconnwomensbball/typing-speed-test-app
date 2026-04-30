@@ -6,7 +6,6 @@ import { faScaleBalanced } from '@fortawesome/free-solid-svg-icons'
 function App() {
   
   const [isInitialScreen, setIsInitialScreen] = useState(true)
-  const [isResultsScreen, setIsResultsScreen] = useState(false)
   const [isFirstTest, setIsFirstTest] = useState(false)
   const [isTestOver, setIsTestOver] = useState(false)
   const [isDifficultyMenuDisplayed, setIsDifficultyMenuDisplayed] = useState(false)
@@ -15,38 +14,42 @@ function App() {
   const [passageDifficulty, setPassageDifficulty] = useState("Hard")
   const [testType, setTestType] = useState("Timed (60s)")
   const [randomNumber, setRandomNumber] = useState(null)
-  const [timer, setTimer] = useState(60)
+  const [timer, setTimer] = useState(5)
+  const [isHighScore, setIsHighScore] = useState(false)
 
-//the below function is not working correctly 
   function startTest(){
     setIsInitialScreen(false)
     const randomNumber = Math.floor(Math.random()*10)
-    console.log(randomNumber)
   
     
     setPassage(data[passageDifficulty.toLowerCase()][randomNumber].text)
 
    
-//need to fix this setInterval and create an id 
+//TODO: 
     if (testType === "Timed (60s)"){
       const intervalId = setInterval(()=>{
-        setTimer(prevTime=>prevTime-1)
-        if (timer === 0){
-          setTimer(0)
-          return 
-        }
-      },1000)
-     
-        //clearInterval(intervalId)
-     
-      }
-      
-    }
-  
-//complete the resultsHeader logic 
+          setTimer(prevTime=>{
+            if (prevTime !== 0){
+              return prevTime-1}
+            else{
+              setIsTestOver(true)
+              clearInterval(intervalId)
+              setTimer(5)
+            }})},1000)
+      }}
+  console.log("isInitialScreen", isInitialScreen)
+//TODO: complete the resultsHeader logic 
 let resultsHeader 
+let resultsText
 if (isFirstTest){
   resultsHeader = "Baseline Established!"
+  resultsText = "You've set the bar. Now the real challenge begins--time to beat it."
+}else if (isHighScore){
+  resultsHeader = "High Score Smashed!"
+  resultsText = "You're getting faster. That was incredible typing."
+}else{
+  resultsHeader = "Test Complete!"
+  resultsText = "Solid run. Keep pushing to beat your high score."
 }
 
   return (
@@ -60,7 +63,10 @@ if (isFirstTest){
         </div>
       </header>
 
-      <main className="flex flex-col justify-center items-center">
+  <main className="flex flex-col justify-center items-center">
+    {!isTestOver?
+   
+    <>
         <nav className="flex flex-row gap-4 mb-4">
           <div>
             <p className="text-neutral-400">WPM:</p>
@@ -116,28 +122,39 @@ if (isFirstTest){
           </div>
         </div>
 
+       
         <div className="text-neutral-50 border-t border-b p-2">
           <p className={isInitialScreen? "blur-sm": ""}>{passage}</p>
         </div>
-        {!isInitialScreen && <button className="flex flex-row gap-2 text-neutral-50 bg-neutral-800 mt-4 mb-4 p-2 rounded-md" onClick={()=>{setIsInitialScreen(true)}}>Restart Test <img src="src/assets/images/icon-restart.svg"/></button>}
+        {!isInitialScreen && <button className="flex flex-row gap-2 text-neutral-50 bg-neutral-800 mt-4 mb-4 p-2 rounded-md" onClick={()=>{
+          setIsTestOver(false)
+          setIsInitialScreen(true)
+          
+          }}>Restart Test <img src="src/assets/images/icon-restart.svg"/></button>}
         {isInitialScreen && <div className="flex flex-col justify-center items-center">
           <button className="text-neutral-50 bg-blue-600 p-2 rounded-md mb-4" onClick={startTest}>Start Typing Test</button>
           <p className="text-neutral-50">Or click the text and start typing</p>
         </div>}
-        {isResultsScreen && <div>
-        <img src={isFirstTest? "src/assets/images/icon-new-pb.svg": "src/assets/images/icon-completed.svg"}/>  
-        <h1>{resultsHeader}</h1>
-        <p></p>
-        <div className="border">
-          <p>WPM</p>
-        </div>
-        <div className="border">
-          <p>Accuracy</p>
-        </div>
-        <div className="border">
-          <p>Characters</p>
-        </div>
-        <button></button>
+        </>:
+        <div className="flex flex-col justify-center items-center gap-2">
+          <img src={isFirstTest? "src/assets/images/icon-new-pb.svg": "src/assets/images/icon-completed.svg"}/>  
+          <h1 className="text-neutral-50 font-soraBold">{resultsHeader}</h1>
+          <p className="text-neutral-400">{resultsText}</p>
+          <div className="border w-full mt-2 rounded pt-2 pb-2 pl-2">
+            <p className="text-neutral-400">WPM:</p>
+            <p className="text-neutral-50 font-soraBold">85</p>
+          </div>
+          <div className="border w-full mt-4 mb-4 rounded pt-2 pb-2 pl-2">
+            <p className="text-neutral-400">Accuracy:</p>
+            <p className="text-green-500 font-soraBold">100%</p>
+          </div>
+          <div className="border w-full rounded pt-2 pb-2 pl-2">
+            <p className="text-neutral-400">Characters:</p>
+            <p className="font-soraBold"><span className="text-green-500">120</span><span className="text-neutral-400">/</span><span className="text-red-500">5</span></p>
+          </div>
+          <button className="flex flex-row gap-2 text-neutral-50 bg-neutral-800 mt-4 mb-4 p-2 rounded-md" onClick={()=>{
+            setIsTestOver(false)
+            setIsInitialScreen(true)}}>Go Again <img src="src/assets/images/icon-restart.svg"/></button>
         </div>}
       </main>
       <footer className="text-neutral-50">JDJD Codes <FontAwesomeIcon icon={faScaleBalanced}/></footer>
