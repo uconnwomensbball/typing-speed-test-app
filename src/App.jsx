@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import data from './data.json'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faScaleBalanced } from '@fortawesome/free-solid-svg-icons'
 
 function App() {
-  
+  //state variables
   const [isInitialScreen, setIsInitialScreen] = useState(true)
   const [isFirstTest, setIsFirstTest] = useState(false)
+  const [isHighScore, setIsHighScore] = useState(true)
   const [isTestOver, setIsTestOver] = useState(false)
   const [isDifficultyMenuDisplayed, setIsDifficultyMenuDisplayed] = useState(false)
   const [isTestTypeMenuDisplayed, setIsTypeTestMenuDisplayed] = useState(false)
@@ -14,10 +15,11 @@ function App() {
   const [passage, setPassage] = useState(data.hard[0].text)
   const [passageDifficulty, setPassageDifficulty] = useState("Hard")
   const [testType, setTestType] = useState("Timed (60s)")
-  const [randomNumber, setRandomNumber] = useState(null)
   const [timer, setTimer] = useState(10)
-  const [isHighScore, setIsHighScore] = useState(false)
+ 
   const [typedText, setTypedText] = useState([])
+  //refs 
+  const intervalRef = useRef(null)
 
   //function - starts test upon click of "Start Typing Test" button 
   function startTest(){
@@ -29,27 +31,37 @@ function App() {
     setPassage(data[passageDifficulty.toLowerCase()][randomNumber].text)
 
     if (testType === "Timed (60s)"){
-      const intervalId = setInterval(()=>{
+      intervalRef.current = setInterval(()=>{
+        
           setTimer(prevTime=>{
-            if (prevTime !== 0){
+           if (prevTime !== 0){
               return prevTime-1}
             else{
               setIsTestOver(true)
               setIsMenuDisabled(false)
               setTypedText([])
-              clearInterval(intervalId)
+              clearInterval(intervalRef.current)
               setTimer(10)
             }})},1000)
   }}
 
+  //function - restarts test if user clicks "Go Again" during a test 
+  function restartTest(){
+    clearInterval(intervalRef.current)
+    setTimer(10)
+    setIsTestOver(false)
+    setIsInitialScreen(true)
+    setIsMenuDisabled(false)
+  }
+
   function handleKeyPress(e){
     if (!isTestOver){
       setTypedText((prevKey)=>[...prevKey, e.key])
-    }
-  
-  }
+    }}
+
  console.log("typedText", typedText)
  console.log("passage", passage)
+
   useEffect(()=>{
     window.addEventListener("keydown", handleKeyPress)
     return () => {
@@ -97,7 +109,7 @@ if (isFirstTest){
           </div>
           <div className="flex flex-col items-center flex-1">
             <p className="text-neutral-400">Time:</p>
-            <p className="text-neutral-50 font-soraBold">0:{String(timer).padStart(2, "0")}</p>
+            <p className="text-neutral-50 font-soraBold" ref={intervalRef}>0:{String(timer).padStart(2, "0")}</p>
           </div>
         </nav>
    
@@ -142,28 +154,24 @@ if (isFirstTest){
         </div>
 
        
-        <div className={`text-neutral-50 border-t ${!isInitialScreen? "border-b": ""} p-2 mb-2 relative`}>
+        <div className={`text-neutral-50 border-t cursor-pointer ${!isInitialScreen? "border-b": ""} p-2 mb-2 relative`} onClick={startTest}>
           <p className={`pt-4 ${isInitialScreen? "blur-sm": ""}`}>{passage.split("").map((passageLetter, index)=>{
             return <span className={passageLetter[index] === typedText[index]? "text-green-500": "text-red-500"}>{passageLetter}</span>
               
             })}</p>
             {isInitialScreen && <div className="flex flex-col justify-center items-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full">
-          <button className="text-neutral-50 bg-blue-600 p-2 rounded-md mb-4 hover:bg-blue-400" onClick={startTest}>Start Typing Test</button>
+          <button className="text-neutral-50 bg-blue-600 p-2 rounded-md mb-4 hover:bg-blue-400">Start Typing Test</button>
           <p className="text-neutral-50">Or click the text and start typing</p>
         </div>}
         </div>
-        {!isInitialScreen && <button className="flex flex-row gap-2 text-neutral-50 bg-neutral-800 mt-4 mb-4 p-2 rounded-md" onClick={()=>{
-          setIsTestOver(false)
-          setIsInitialScreen(true)
-          
-          }}>Restart Test <img src="src/assets/images/icon-restart.svg"/></button>}
+        {!isInitialScreen && <button className="flex flex-row gap-2 text-neutral-50 bg-neutral-800 mt-4 mb-4 p-2 rounded-md" onClick={restartTest}>Restart Test <img src="src/assets/images/icon-restart.svg"/></button>}
       
         </>:
         <div className="flex flex-col justify-center items-center gap-2">
-          <img className="mr-auto" src="src/assets/images/pattern-star-2.svg"/>
-          <img src={isFirstTest? "src/assets/images/icon-new-pb.svg": "src/assets/images/icon-completed.svg"}/>  
-          <h1 className="text-neutral-50 font-soraBold">{resultsHeader}</h1>
-          <p className="text-neutral-400">{resultsText}</p>
+          {isHighScore? "":<img className="mr-auto w-6" src="src/assets/images/pattern-star-2.svg"/>}
+          <img src={isHighScore? "src/assets/images/icon-new-pb.svg": "src/assets/images/icon-completed.svg"}/>  
+          <h1 className="text-neutral-50 font-soraBold tracking-wide text-xl">{resultsHeader}</h1>
+          <p className="text-neutral-400 text-center">{resultsText}</p>
           <div className="border w-full mt-2 rounded pt-2 pb-2 pl-2">
             <p className="text-neutral-400">WPM:</p>
             <p className="text-neutral-50 font-soraBold">85</p>
@@ -178,8 +186,9 @@ if (isFirstTest){
           </div>
           <button className="flex flex-row gap-2 text-neutral-50 bg-neutral-800 mt-4 mb-4 p-2 rounded-md hover:bg-neutral-50 hover:text-neutral-800" onClick={()=>{
             setIsTestOver(false)
-            setIsInitialScreen(true)}}>Go Again <img src="src/assets/images/icon-restart.svg"/></button>
-            <img className="ml-auto" src="src/assets/images/pattern-star-1.svg"/>
+            setIsInitialScreen(true)
+            }}>{isFirstTest? "Beat This Score": "Go Again"}<img src="src/assets/images/icon-restart.svg"/></button>
+            {isHighScore? <img className="z-0 relative" src="src/assets/images/pattern-confetti.svg"/>: <img className="ml-auto w-8" src="src/assets/images/pattern-star-1.svg"/>}
         </div>}
       </main>
       <footer className="text-neutral-50">JDJD Codes <FontAwesomeIcon icon={faScaleBalanced}/></footer>
