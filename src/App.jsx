@@ -84,21 +84,32 @@ if (isFirstTest){
 }
 
   return (
-    <div className="bg-neutral-900 flex flex-col justify-center items-center max-w-sm m-auto font-soraReg p-4">
+    <div className="bg-neutral-900 flex flex-col justify-center items-center m-auto font-soraReg p-4">
 
       <header className="flex flex-row justify-between items-center w-full mb-4">
-        <img src="src\assets\images\logo-small.svg"/>
-        <div className="flex flex-row justify-center items-center">
+        <img className="md:hidden" src="src\assets\images\logo-small.svg"/>
+        <div className="hidden md:block md:flex md:flex-row gap-2">
+          <img src="src\assets\images\logo-small.svg"/>
+          <div >
+            <h1 className="text-neutral-50 font-black tracking-wide">Typing Speed Test</h1>
+            <p className="text-neutral-400 text-xs">Type as fast as you can in 60 seconds</p>
+          </div>
+        </div>
+        <div className="flex">
           <img src="src\assets\images\icon-personal-best.svg"/>
-          <p className="text-neutral-400 ml-2">Best: <span className="text-neutral-50">92 WPM</span></p>
+          
+            <span className="hidden md:block text-neutral-400 ml-2 mr-1">Personal </span>
+            <p className="text-neutral-400 mr-2">Best: </p> 
+            <span className="text-neutral-50">92 WPM</span>
+         
         </div>
       </header>
-
-  <main className="flex flex-col justify-center items-center">
+  {/* Fix the below main element layout for small and large screens*/}
+  <main className="flex flex-col md:justify-between border">
     {!isTestOver?
    
     <>
-        <nav className="flex flex-row justify-center mb-4 w-full">
+        <nav className="flex flex-row justify-center mb-4 w-full md:hidden">
           <div className="flex flex-col items-center flex-1">
             <p className="text-neutral-400">WPM:</p>
             <p className="text-neutral-50 font-soraBold">0</p>
@@ -112,8 +123,9 @@ if (isFirstTest){
             <p className="text-neutral-50 font-soraBold" ref={intervalRef}>0:{String(timer).padStart(2, "0")}</p>
           </div>
         </nav>
-   
-          <div className="flex flex-row justify-center items-center gap-4 mb-4 w-full">
+
+          {/*Difficulty Menu for small screens*/}
+          <div className="flex flex-row justify-center items-center gap-4 mb-4 w-full md:hidden">
             <div className="flex flex-col flex-1">
               <div className="border border-neutral-400 pr-4 pl-4 flex flex-row justify-center items-center gap-2 rounded-md cursor-pointer" onClick={()=>{if (!isMenuDisabled){setIsDifficultyMenuDisplayed(prevVal=>!prevVal)}}}>
                 <p className="text-neutral-200">{passageDifficulty}</p>
@@ -135,6 +147,7 @@ if (isFirstTest){
               </div>}
             </div>
 
+          {/*Test Type Menu for small screens*/}
           <div className="flex flex-col flex-1">
             <div className="flex flex-row justify-center items-center gap-2 border border-neutral-400 rounded-md cursor-pointer" onClick={()=>{if (!isMenuDisabled){setIsTypeTestMenuDisplayed(prevVal=>!prevVal)}}}>
               <p className="text-neutral-200">{testType}</p>
@@ -153,7 +166,30 @@ if (isFirstTest){
           </div>
         </div>
 
-       
+        {/*Difficulty Menu for medium/large screens*/}   
+        <nav className="hidden md:block border flex flex-row">
+          <div className="flex flex-row">
+            <div>
+              <p className="text-neutral-400">WPM:</p>
+              <p className="text-neutral-50 font-soraBold">0</p>
+            </div>
+            <div className="border-l border-r">
+              <p className="text-neutral-400">Accuracy:</p>
+              <p className="text-neutral-50 font-soraBold">100%</p>
+            </div>
+            <div>
+              <p className="text-neutral-400">Time:</p>
+              <p className="text-neutral-50 font-soraBold" ref={intervalRef}>0:{String(timer).padStart(2, "0")}</p>
+            </div>
+          </div>
+          <div>
+            <p className="text-neutral-400">Difficulty: </p>
+            <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400">Easy</button>
+            <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400">Medium</button>
+            <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400">Hard</button>
+          </div>
+        </nav>
+
         <div className={`text-neutral-50 border-t cursor-pointer ${!isInitialScreen? "border-b": ""} p-2 mb-2 relative`} onClick={startTest}>
           <p className={`pt-4 ${isInitialScreen? "blur-sm": ""}`}>{passage.split("").map((passageLetter, index)=>{
             return <span className={passageLetter[index] === typedText[index]? "text-green-500": "text-red-500"}>{passageLetter}</span>
