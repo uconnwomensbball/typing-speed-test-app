@@ -84,9 +84,9 @@ if (isFirstTest){
 }
 
   return (
-    <div className="bg-neutral-900 flex flex-col justify-center items-center m-auto font-soraReg p-4">
+    <div className="bg-neutral-900 flex flex-col items-center font-soraReg p-4 pt-2 md:pr-14 md:pl-14 min-h-screen">
 
-      <header className="flex flex-row justify-between items-center w-full mb-4">
+      <header className="flex flex-row justify-between items-center w-full mt-2 mb-4 mb-14">
         <img className="md:hidden" src="src\assets\images\logo-small.svg"/>
         <div className="hidden md:block md:flex md:flex-row gap-2">
           <img src="src\assets\images\logo-small.svg"/>
@@ -98,14 +98,14 @@ if (isFirstTest){
         <div className="flex">
           <img src="src\assets\images\icon-personal-best.svg"/>
           
-            <span className="hidden md:block text-neutral-400 ml-2 mr-1">Personal </span>
-            <p className="text-neutral-400 mr-2">Best: </p> 
+            <span className="hidden md:block text-neutral-400 ml-1">Personal </span>
+            <p className="text-neutral-400 mr-2 ml-1">Best:</p> 
             <span className="text-neutral-50">92 WPM</span>
          
         </div>
       </header>
-  {/* Fix the below main element layout for small and large screens*/}
-  <main className="flex flex-col md:justify-between border">
+ 
+  <main className="flex flex-col flex-1">
     {!isTestOver?
    
     <>
@@ -149,12 +149,12 @@ if (isFirstTest){
 
           {/*Test Type Menu for small screens*/}
           <div className="flex flex-col flex-1">
-            <div className="flex flex-row justify-center items-center gap-2 border border-neutral-400 rounded-md cursor-pointer" onClick={()=>{if (!isMenuDisabled){setIsTypeTestMenuDisplayed(prevVal=>!prevVal)}}}>
+            <div className="flex flex-row justify-center items-center gap-2 rounded-md cursor-pointer border border-neutral-400" onClick={()=>{if (!isMenuDisabled){setIsTypeTestMenuDisplayed(prevVal=>!prevVal)}}}>
               <p className="text-neutral-200">{testType}</p>
               <img src="src\assets\images\icon-down-arrow.svg" />
             </div>
             {isTestTypeMenuDisplayed && <div className="text-neutral-50 bg-neutral-800 ">
-              <label htmlFor="timed" className="flex flex-row border-b pt-1 pb-1 pr-2 cursor-pointer">
+              <label htmlFor="timed" className="flex flex-row border border-b pt-1 pb-1 pr-2 cursor-pointer">
                 <input id="timed" className="mr-2 ml-2" type="radio" name="test-type" value="timed" checked={testType === "Timed (60s)"? true: false} onChange={()=>setTestType("Timed (60s)")}></input>
                 <p>Timed (60s)</p>
               </label>
@@ -167,26 +167,33 @@ if (isFirstTest){
         </div>
 
         {/*Difficulty Menu for medium/large screens*/}   
-        <nav className="hidden md:block border flex flex-row">
-          <div className="flex flex-row">
-            <div>
+        <nav className="hidden md:flex flex-row justify-between items-end mb-2">
+          <div className="flex flex-row gap-8">
+            <div className="flex flex-col items-center justify-center">
               <p className="text-neutral-400">WPM:</p>
               <p className="text-neutral-50 font-soraBold">0</p>
             </div>
-            <div className="border-l border-r">
+            <div className="border-l border-r pr-8 pl-8 flex flex-col items-center justify-center">
               <p className="text-neutral-400">Accuracy:</p>
               <p className="text-neutral-50 font-soraBold">100%</p>
             </div>
-            <div>
+            <div className="flex flex-col items-center justify-center"> 
               <p className="text-neutral-400">Time:</p>
               <p className="text-neutral-50 font-soraBold" ref={intervalRef}>0:{String(timer).padStart(2, "0")}</p>
             </div>
           </div>
-          <div>
-            <p className="text-neutral-400">Difficulty: </p>
-            <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400">Easy</button>
-            <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400">Medium</button>
-            <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400">Hard</button>
+          <div className="flex flex-row gap-2">
+            <div className="flex flex-row justify-center items-center gap-1 border-r pr-4">
+              <p className="text-neutral-400 mr-2">Difficulty: </p>
+              <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2">Easy</button>
+              <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2">Medium</button>
+              <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2">Hard</button>
+            </div>
+            <div className="flex flex-row justify-center items-center gap-1 pl-2">
+              <p className="text-neutral-400">Mode: </p>
+              <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2">Timed(60s)</button>
+              <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2">Passage</button>
+            </div>
           </div>
         </nav>
 
@@ -208,22 +215,24 @@ if (isFirstTest){
           <img src={isHighScore? "src/assets/images/icon-new-pb.svg": "src/assets/images/icon-completed.svg"}/>  
           <h1 className="text-neutral-50 font-soraBold tracking-wide text-xl">{resultsHeader}</h1>
           <p className="text-neutral-400 text-center">{resultsText}</p>
-          <div className="border w-full mt-2 rounded pt-2 pb-2 pl-2">
-            <p className="text-neutral-400">WPM:</p>
-            <p className="text-neutral-50 font-soraBold">85</p>
-          </div>
-          <div className="border w-full mt-4 mb-4 rounded pt-2 pb-2 pl-2">
-            <p className="text-neutral-400">Accuracy:</p>
-            <p className="text-green-500 font-soraBold">100%</p>
-          </div>
-          <div className="border w-full rounded pt-2 pb-2 pl-2">
-            <p className="text-neutral-400">Characters:</p>
-            <p className="font-soraBold"><span className="text-green-500">120</span><span className="text-neutral-400">/</span><span className="text-red-500">5</span></p>
+          <div className="md:flex md:flex-row w-full gap-4">
+            <div className="border mt-2 rounded pt-2 pb-2 pl-2 md:flex md:flex-col md:justify-start md:items-center">
+              <p className="text-neutral-400">WPM:</p>
+              <p className="text-neutral-50 font-soraBold">85</p>
+            </div>
+            <div className="border w-full mt-4 mb-4 rounded pt-2 pb-2 pl-2">
+              <p className="text-neutral-400">Accuracy:</p>
+              <p className="text-green-500 font-soraBold">100%</p>
+            </div>
+            <div className="border w-full rounded pt-2 pb-2 pl-2">
+              <p className="text-neutral-400">Characters:</p>
+              <p className="font-soraBold"><span className="text-green-500">120</span><span className="text-neutral-400">/</span><span className="text-red-500">5</span></p>
+            </div>
           </div>
           <button className="flex flex-row gap-2 text-neutral-50 bg-neutral-800 mt-4 mb-4 p-2 rounded-md hover:bg-neutral-50 hover:text-neutral-800" onClick={()=>{
             setIsTestOver(false)
             setIsInitialScreen(true)
-            }}>{isFirstTest? "Beat This Score": "Go Again"}<img src="src/assets/images/icon-restart.svg"/></button>
+            }}>{isFirstTest || isHighScore? "Beat This Score": "Go Again"}<img src="src/assets/images/icon-restart.svg"/></button>
             {isHighScore? <img className="z-0 relative" src="src/assets/images/pattern-confetti.svg"/>: <img className="ml-auto w-8" src="src/assets/images/pattern-star-1.svg"/>}
         </div>}
       </main>
