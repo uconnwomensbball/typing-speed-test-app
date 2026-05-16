@@ -27,8 +27,6 @@ function App() {
     setIsDifficultyMenuDisplayed(false)
     setIsTypeTestMenuDisplayed(false)
     setIsMenuDisabled(true)
-    const randomNumber = Math.floor(Math.random()*10)
-    setPassage(data[passageDifficulty.toLowerCase()][randomNumber].text)
 
     if (testType === "Timed (60s)"){
       intervalRef.current = setInterval(()=>{
@@ -44,6 +42,12 @@ function App() {
               setTimer(10)
             }})},1000)
   }}
+
+  //useEffect - changes the passage difficulty before the test starts based on user clicks
+  useEffect(()=>{
+    const randomNumber = Math.floor(Math.random()*10)
+    setPassage(data[passageDifficulty.toLowerCase()][randomNumber].text)
+  }, [passageDifficulty])
 
   //function - restarts test if user clicks "Go Again" during a test 
   function restartTest(){
@@ -86,7 +90,7 @@ if (isFirstTest){
   return (
     <div className="bg-neutral-900 flex flex-col items-center font-soraReg p-4 pt-2 md:pr-14 md:pl-14 min-h-screen">
 
-      <header className="flex flex-row justify-between items-center w-full mt-2 mb-4 mb-14">
+      <header className="flex flex-row justify-between items-center w-full mt-2 mb-4 mb-14 md:max-w-6xl">
         <img className="md:hidden" src="src\assets\images\logo-small.svg"/>
         <div className="hidden md:block md:flex md:flex-row gap-2">
           <img src="src\assets\images\logo-small.svg"/>
@@ -95,7 +99,7 @@ if (isFirstTest){
             <p className="text-neutral-400 text-xs">Type as fast as you can in 60 seconds</p>
           </div>
         </div>
-        <div className="flex">
+        <div className="flex md:text-sm lg:text-base">
           <img src="src\assets\images\icon-personal-best.svg"/>
           
             <span className="hidden md:block text-neutral-400 ml-1">Personal </span>
@@ -105,7 +109,7 @@ if (isFirstTest){
         </div>
       </header>
  
-  <main className="flex flex-col flex-1">
+  <main className="flex flex-col flex-1 md:max-w-6xl">
     {!isTestOver?
    
     <>
@@ -167,48 +171,53 @@ if (isFirstTest){
         </div>
 
         {/*Difficulty Menu for medium/large screens*/}   
-        <nav className="hidden md:flex flex-row justify-between items-end mb-2">
-          <div className="flex flex-row gap-8">
-            <div className="flex flex-col items-center justify-center">
-              <p className="text-neutral-400">WPM:</p>
+        <nav className="hidden gap-2 md:flex flex-row justify-between items-center mb-2 md:text-xs lg:text-base">
+          <div className="flex flex-row">
+            <div className="flex flex-row items-center justify-center pr-2">
+              <p className="text-neutral-400 mr-1">WPM:</p>
               <p className="text-neutral-50 font-soraBold">0</p>
             </div>
-            <div className="border-l border-r pr-8 pl-8 flex flex-col items-center justify-center">
-              <p className="text-neutral-400">Accuracy:</p>
+            <div className="border-l border-r flex flex-row items-center justify-center pr-2 pl-2">
+              <p className="text-neutral-400 mr-1">Accuracy:</p>
               <p className="text-neutral-50 font-soraBold">100%</p>
             </div>
-            <div className="flex flex-col items-center justify-center"> 
-              <p className="text-neutral-400">Time:</p>
+            <div className="flex flex-row items-center justify-center pl-2"> 
+              <p className="text-neutral-400 mr-1">Time:</p>
               <p className="text-neutral-50 font-soraBold" ref={intervalRef}>0:{String(timer).padStart(2, "0")}</p>
             </div>
           </div>
           <div className="flex flex-row gap-2">
-            <div className="flex flex-row justify-center items-center gap-1 border-r pr-4">
-              <p className="text-neutral-400 mr-2">Difficulty: </p>
-              <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2">Easy</button>
-              <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2">Medium</button>
-              <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2">Hard</button>
+            <div className="flex flex-row justify-center items-center gap-1 border-r pr-2">
+              <p className="text-neutral-400 mr-1">Difficulty: </p>
+              <button className={`${passageDifficulty === "Easy"? "text-blue-400 border border-blue-400":"text-neutral-50 border border-neutral-400"} hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2`} 
+                      disabled={isInitialScreen? false: true} onClick={()=>setPassageDifficulty("Easy")}>Easy</button>
+              <button className={`${passageDifficulty === "Medium"? "text-blue-400 border border-blue-400": "text-neutral-50 border border-neutral-400"} hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2`} 
+                      disabled={isInitialScreen? false: true} onClick={()=>setPassageDifficulty("Medium")}>Medium</button>
+              <button className={`${passageDifficulty === "Hard"? "text-blue-400 border border-blue-400":"text-neutral-50 border border-neutral-400"} hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2"`} 
+                      disabled={isInitialScreen? false: true} onClick={()=>setPassageDifficulty("Hard")}>Hard</button>
             </div>
-            <div className="flex flex-row justify-center items-center gap-1 pl-2">
+            <div className="flex flex-row justify-center items-center gap-1">
               <p className="text-neutral-400">Mode: </p>
-              <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2">Timed(60s)</button>
-              <button className="text-neutral-50 border border-neutral-400 hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2">Passage</button>
+              <button className={`${testType === "Timed (60s)"? "text-blue-400 border border-blue-400": "text-neutral-50 border border-neutral-400"} hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2`} 
+                      disabled={isInitialScreen? false: true} onClick={()=>setTestType("Timed (60s)")}>Timed(60s)</button>
+              <button className={`${testType === "Passage"? "text-blue-400 border border-blue-400": "text-neutral-50 border border-neutral-400"} hover:border-blue-400 hover:text-blue-400 rounded-md pt-1 pb-1 pr-2 pl-2`} 
+                      disabled={isInitialScreen? false: true} onClick={()=>setTestType("Passage")}>Passage</button>
             </div>
           </div>
         </nav>
 
         <div className={`text-neutral-50 border-t cursor-pointer ${!isInitialScreen? "border-b": ""} p-2 mb-2 relative`} onClick={startTest}>
-          <p className={`pt-4 ${isInitialScreen? "blur-sm": ""}`}>{passage.split("").map((passageLetter, index)=>{
-            return <span className={passageLetter[index] === typedText[index]? "text-green-500": "text-red-500"}>{passageLetter}</span>
-              
-            })}</p>
+          <p className={`pt-4 md:text-2xl ${isInitialScreen? "blur-sm": ""}`}>{passage.split("").map((passageLetter, index)=>{
+            return <span className={passageLetter[index] === typedText[index]? "text-green-500": "text-red-500"}>{passageLetter}</span>})}</p>
             {isInitialScreen && <div className="flex flex-col justify-center items-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full">
           <button className="text-neutral-50 bg-blue-600 p-2 rounded-md mb-4 hover:bg-blue-400">Start Typing Test</button>
           <p className="text-neutral-50">Or click the text and start typing</p>
         </div>}
         </div>
-        {!isInitialScreen && <button className="flex flex-row gap-2 text-neutral-50 bg-neutral-800 mt-4 mb-4 p-2 rounded-md" onClick={restartTest}>Restart Test <img src="src/assets/images/icon-restart.svg"/></button>}
-      
+        {!isInitialScreen && 
+        <div className="flex flex-row justify-center items-center">
+        <button className="flex flex-row gap-2 text-neutral-50 bg-neutral-800 mt-4 mb-4 p-2 rounded-md" onClick={restartTest}>Restart Test <img src="src/assets/images/icon-restart.svg"/></button>
+        </div>}
         </>:
         <div className="flex flex-col justify-center items-center gap-2">
           {isHighScore? "":<img className="mr-auto w-6" src="src/assets/images/pattern-star-2.svg"/>}
